@@ -19,12 +19,14 @@ double Tre(istringstream& st, double x);
 
 int main() {
     setlocale(LC_ALL, "RU");
+
     string resul;
 
     cout << "Введите выражение: ";
     getline(cin, resul);
 
     istringstream st(resul);//создаем поток из resul
+    
     double result = chet(st);
     cout << "Результат: " << result << endl;
     if (!correct(st)) {
@@ -35,7 +37,7 @@ int main() {
 }
 
 
-double chet(istringstream& st) {
+double chet(std::istringstream& st) {
     double fr = chet2(st);
     char ind;//для хранения символа
 
@@ -54,7 +56,7 @@ double chet(istringstream& st) {
 }
 
 
-double chet2(istringstream& st) {
+double chet2(std::istringstream& st) {
     double hf = skobochki(st);
     char el;
 
@@ -73,35 +75,27 @@ double chet2(istringstream& st) {
 }
 
 
-double skobochki(istringstream& st) {
+double skobochki(std::istringstream& st) {
     double qt;
     char cr;
-    if (st >> cr) {
-        if (isdigit(cr) || cr == '-') {//проверяем цифра это или знак минус 
-            st.putback(cr);//возвращаем обратно в поток 
-            st >> qt;//опять достаем его,но уже целиком и записываем
-            return qt;
-        }
-        else if (cr == 's' || cr == 'c' || cr == 't' || cr == 'e' || cr == 'x') {
-            string namef;
-            namef += cr;
-            st >> cr;
-            while (isalpha(cr)) {
-                namef += cr;
-                st >> cr;
-            }
-            st.putback(cr);
-            st >> qt;
-            return Trigo(namef, qt);
-        }
-        else {
-            cout << "Неверно введеное выражение" << endl;
+
+    st >> cr;
+
+    if (isdigit(cr) || cr == '-') {//проверяет цифра или знак минус 
+        st.unget(); // возвращаем символ обратно, чтобы считать число целиком
+        st >> qt; // считываем значение
+    }
+    else if (cr == '(') {
+        qt = chet(st);
+        st >> cr; // ожидаем закрывающую скобку
+        if (cr != ')') {
+            cout << "Не хватает какой-то скобки " << endl;
         }
     }
-    return 0;
+    return qt;
 }
 
-bool correct(istringstream& st) {
+bool correct(std::istringstream& st) {
     int count = 0;
     char ht;
     st >> ht;
